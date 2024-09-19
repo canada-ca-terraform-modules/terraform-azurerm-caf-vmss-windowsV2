@@ -16,7 +16,7 @@ resource "azurerm_lb" "loadbalancer" {
     content {
       name                                               = "${local.vmss_name}-${frontend_ip_configuration.key}-lbfe"
       zones                                              = try(frontend_ip_configuration.value.zones, null)
-      subnet_id                                          = var.subnets[frontend_ip_configuration.value.subnet_name].id
+      subnet_id                                          = strcontains(frontend_ip_configuration.value.subnet, "/resourceGroups/") ? frontend_ip_configuration.value.subnet : var.subnets[frontend_ip_configuration.value.subnet].id
       gateway_load_balancer_frontend_ip_configuration_id = try(frontend_ip_configuration.value.gateway_load_balancer_frontend_ip_configuration_id, null)
       private_ip_address                                 = try(frontend_ip_configuration.value.private_ip_address_allocation, "Static") == "Static" ? frontend_ip_configuration.value.private_ip_address : null
       private_ip_address_allocation                      = try(frontend_ip_configuration.value.private_ip_address_allocation, "Static")

@@ -4,7 +4,7 @@ variable "vmss_windowsV2" {
 
 module "vmss_windowsV2" {
   for_each = var.vmss_windowsV2
-  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-vmss-windowsV2?ref=v1.0.0"
+  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-vmss-windowsV2?ref=v1.0.1"
 
   location          = var.location
   subnets           = local.subnets
