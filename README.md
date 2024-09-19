@@ -1,4 +1,9 @@
 # AzureRM VMSS Windows V2
+
+## Terraform variables for this module
+
+[./ESLZ/vmss-windowsV2.tfvars](./ESLZ/vmss-windowsV2.tfvars)
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

@@ -11,7 +11,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   do_not_run_extensions_on_overprovisioned_machines = try(var.vmss.do_not_run_extensions_on_overprovisioned_machines, false)
   edge_zone                                         = try(var.vmss.edge_zone, null)
   enable_automatic_updates                          = try(var.vmss.enable_automatic_updates, null)
-  encryption_at_host_enabled                        = try(var.vmss.encryption_at_host_enabled, null)
+  encryption_at_host_enabled                        = try(var.vmss.encryption_at_host_enabled, true)
   extension_operations_enabled                      = try(var.vmss.extension_operations_enabled, null)
   extensions_time_budget                            = try(var.vmss.extensions_time_budget, null)
   eviction_policy                                   = try(var.vmss.eviction_policy, null)
