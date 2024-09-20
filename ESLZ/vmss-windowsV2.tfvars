@@ -1,6 +1,5 @@
 vmss_windowsV2 = {
   devops = {
-    # custom_name = "some-custom-name" # Optional. ONLY use if you really really really don't want to use the auto generated name
     userDefinedString    = "devops" # Max 55 chars
     postfix              = "01"
     computer_name_prefix = "vmsswin-" # (Optional) The prefix which should be used for the name of the Virtual Machines in this Scale Set. Default: "vmsswin-"
@@ -90,9 +89,9 @@ vmss_windowsV2 = {
 
       frontend_ip_configuration = {
         feipc1 = {
-          subnet                                             = "MAZ"         # (Required) The name or the resource id of the Subnet which should be used for this IP Configuration
+          subnet = "MAZ" # (Required) The name or the resource id of the Subnet which should be used for this IP Configuration
           # private_ip_address                                 = "10.10.10.10" # (Optional) Private IP Address to assign to the Load Balancer. The last one and first four IPs in any range are reserved and cannot be manually assigned.
-          private_ip_address_allocation                      = "Dynamic"     # (Optional) The allocation method for the Private IP Address used by this Load Balancer. Possible values as Dynamic and Static.
+          private_ip_address_allocation = "Dynamic" # (Optional) The allocation method for the Private IP Address used by this Load Balancer. Possible values as Dynamic and Static.
           # private_ip_address_version                         = "IPv4"        # (Optional) The version of IP that the Private IP Address is. Possible values are IPv4 or IPv6.
           # public_ip_address_id                               = ""            # (Optional) The ID of a Public IP Address which should be associated with the Load Balancer.
           # public_ip_prefix_id                                = ""            # (Optional) The ID of a Public IP Prefix which should be associated with the Load Balancer. Public IP Prefix can only be used with outbound rules.
@@ -137,7 +136,7 @@ vmss_windowsV2 = {
         }
         tcp80 = {
           protocol        = "Tcp" # (Optional) Specifies the protocol of the end point. Possible values are Http, Https or Tcp. If TCP is specified, a received ACK is required for the probe to be successful. If HTTP is specified, a 200 OK response from the specified URI is required for the probe to be successful. Defaults to Tcp.
-          port            = 80   # (Required) Port on which the Probe queries the backend endpoint. Possible values range from 1 to 65535, inclusive.
+          port            = 80    # (Required) Port on which the Probe queries the backend endpoint. Possible values range from 1 to 65535, inclusive.
           probe_threshold = 1     # (Optional) The number of consecutive successful or failed probes that allow or deny traffic to this endpoint. Possible values range from 1 to 100. The default value is 1.
           # request_path        = ""    # (Optional) The URI used for requesting health status from the backend endpoint. Required if protocol is set to Http or Https. Otherwise, it is not allowed.
           # interval_in_seconds = 15    # (Optional) The interval, in seconds between probes to the backend endpoint for health status. The default value is 15, the minimum value is 5.
