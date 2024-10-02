@@ -10,7 +10,7 @@ module "vmss_windowsV2" {
 
   location          = var.location
   subnets           = local.subnets
-  resource_groups   = local.resource_groups
+  resource_groups   = local.resource_groups_all
   userDefinedString = each.key
   env               = var.env
   group             = var.group

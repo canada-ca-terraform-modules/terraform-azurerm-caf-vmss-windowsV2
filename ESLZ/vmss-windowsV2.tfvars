@@ -86,7 +86,8 @@ vmss_windowsV2 = {
       # azurerm_lb section
       #
       # edge_zone = "" # (Optional) Specifies the Edge Zone within the Azure Region where this Load Balancer should exist. Changing this forces a new Load Balancer to be created.
-
+      postfix = "01"
+      resource_group_name ="Project"
       frontend_ip_configuration = {
         feipc1 = {
           subnet = "MAZ" # (Required) The name or the resource id of the Subnet which should be used for this IP Configuration

@@ -148,7 +148,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
           subnet_id                                    = strcontains(ip_configuration.value.subnet, "/resourceGroups/") ? ip_configuration.value.subnet : var.subnets[ip_configuration.value.subnet].id
           application_gateway_backend_address_pool_ids = try(ip_configuration.value.application_gateway_backend_address_pool_ids, [])
           application_security_group_ids               = try(ip_configuration.value.application_security_group_ids, [])
-          load_balancer_backend_address_pool_ids       = try(var.vmss.lb, null) != null ? [azurerm_lb_backend_address_pool.loadbalancer-lbbp[0].id] : []
+          load_balancer_backend_address_pool_ids       = try(var.vmss.lb, null) != null ? [module.load_balancer[0].loadbalancer_backend_address_pool.id] : []
           load_balancer_inbound_nat_rules_ids          = try(ip_configuration.value.load_balancer_inbound_nat_rules_ids, [])
           dynamic "public_ip_address" {
             for_each = try(ip_configuration.value.public_ip_address, null) != null ? [1] : []

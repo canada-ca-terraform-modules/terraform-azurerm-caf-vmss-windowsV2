@@ -3,7 +3,7 @@ output "vmss_windows" {
   description = "VMSS Windows object"
 }
 
-output "loadbalancer" {
-  value       = azurerm_lb.loadbalancer
-  description = "Load Balancer object"
+output "loaddbalancer" {
+  description = "The availability_set object"
+  value       = module.load_balancer
 }
