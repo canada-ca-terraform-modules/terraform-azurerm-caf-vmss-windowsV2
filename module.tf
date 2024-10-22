@@ -52,7 +52,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "automatic_os_upgrade_policy" {
-    for_each = try(var.vmss.automatic_os_upgrade_policy, null) != null ? [1] : []
+    for_each = try(var.vmss.automatic_os_upgrade_policy, {})
     content {
       disable_automatic_rollback  = try(automatic_os_upgrade_policy.value.disable_automatic_rollback, null)
       enable_automatic_os_upgrade = try(automatic_os_upgrade_policy.value.enable_automatic_os_upgrade, null)
@@ -60,7 +60,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "automatic_instance_repair" {
-    for_each = try(var.vmss.automatic_instance_repair, null) != null ? [1] : []
+    for_each = try(var.vmss.automatic_instance_repair, {})
     content {
       enabled      = try(automatic_instance_repair.value.enabled, null)
       grace_period = try(automatic_instance_repair.value.grace_period, null)
@@ -192,7 +192,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "plan" {
-    for_each = try(var.vmss.plan, null) != null ? [1] : []
+    for_each = try(var.vmss.plan, {})
     content {
       name      = plan.value.name
       product   = plan.value.product
@@ -201,7 +201,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "rolling_upgrade_policy" {
-    for_each = try(var.vmss.rolling_upgrade_policy, null) != null ? [1] : []
+    for_each = try(var.vmss.rolling_upgrade_policy, {})
     content {
       cross_zone_upgrades_enabled             = try(rolling_upgrade_policy.value.cross_zone_upgrades_enabled, null)
       max_batch_instance_percent              = try(rolling_upgrade_policy.value.max_batch_instance_percent, null)
@@ -214,7 +214,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "scale_in" {
-    for_each = try(var.vmss.scale_in, null) != null ? [1] : []
+    for_each = try(var.vmss.scale_in, {})
     content {
       rule                   = try(scale_in.value.rule, null)
       force_deletion_enabled = try(scale_in.value.force_deletion_enabled, null)
@@ -243,7 +243,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "spot_restore" {
-    for_each = try(var.vmss.spot_restore, null) != null ? [1] : []
+    for_each = try(var.vmss.spot_restore, {})
     content {
       enabled = try(spot_restore.value.enabled, null)
       timeout = try(spot_restore.value.timeout, null)
@@ -251,7 +251,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "termination_notification" {
-    for_each = try(var.vmss.termination_notification, false) != false ? [1] : []
+    for_each = try(var.vmss.termination_notification, {})
     content {
       enabled = termination_notification.value.enabled
       timeout = try(termination_notification.value.timeout, null)
