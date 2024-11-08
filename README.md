@@ -21,7 +21,7 @@ No requirements.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_boot_diagnostic_storage"></a> [boot\_diagnostic\_storage](#module\_boot\_diagnostic\_storage) | github.com/canada-ca-terraform-modules/terraform-azurerm-caf-storage_accountV2.git | v1.0.3 |
-| <a name="module_load_balancer"></a> [load\_balancer](#module\_load\_balancer) | github.com/canada-ca-terraform-modules/terraform-azurerm-caf-load_balancer.git | n/a |
+| <a name="module_load_balancer"></a> [load\_balancer](#module\_load\_balancer) | github.com/canada-ca-terraform-modules/terraform-azurerm-caf-load_balancer.git | v1.0.2 |
 
 ## Resources
 
