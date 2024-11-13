@@ -214,7 +214,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   dynamic "scale_in" {
-    for_each = try(var.vmss.scale_in, {})
+    for_each = try(var.vmss.scale_in, false) != false ? [1] : []
     content {
       rule                   = try(scale_in.value.rule, null)
       force_deletion_enabled = try(scale_in.value.force_deletion_enabled, null)
