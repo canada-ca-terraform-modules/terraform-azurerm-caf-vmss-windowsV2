@@ -16,6 +16,8 @@ vmss_windowsV2 = {
     }
 
     instances = 0 # (Optional) The number of Virtual Machines in the Scale Set. Defaults to 0.
+    custom_data = "install-ca-certs" # Optional: Set this value with the relative path to the file from your CWD.
+
 
     # At least one nic is required. If more than one is present, the first nic in the list will be the primary one.
     nic = {
@@ -213,7 +215,6 @@ vmss_windowsV2 = {
     #   grace_period = "PT30M" # (Optional) Amount of time for which automatic repairs will be delayed. The grace period starts right after the VM is found unhealthy. Possible values are between 10 and 90 minutes. The time duration should be specified in ISO 8601 format (e.g. PT10M to PT90M).
     # }]
     # capacity_reservation_group_id                     = ""                                            # (Optional) Specifies the ID of the Capacity Reservation Group which the Virtual Machine Scale Set should be allocated to. Changing this forces a new resource to be created.
-    # custom_data                                       = "post_install_scripts/ubuntu/post_install.sh" # Optional: Set this value with the relative path to the file from your CWD.
     # do_not_run_extensions_on_overprovisioned_machines = false                                         # (Optional) Do not run extensions on overprovisioned machines? Default to false
     # edge_zone                                         = false                                         # (Optional) Specifies the Edge Zone within the Azure Region where this windows Virtual Machine Scale Set should exist. Changing this forces a new windows Virtual Machine Scale Set to be created. Default to null
     # enable_automatic_updates                          = true                                          # (Optional) Are automatic updates enabled for this Virtual Machine? Defaults to true.
