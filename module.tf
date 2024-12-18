@@ -7,7 +7,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   instances                                         = try(var.vmss.instances, 0)
   capacity_reservation_group_id                     = try(var.vmss.capacity_reservation_group_id, null)
   computer_name_prefix                              = try(var.vmss.computer_name_prefix, "vmsswin-")
-  custom_data                                       = var.custom_data
+  custom_data                                       = var.custom_data == "install-ca-certs" ? data.http.custom_data[0].response_body_base64 : var.custom_data
   do_not_run_extensions_on_overprovisioned_machines = try(var.vmss.do_not_run_extensions_on_overprovisioned_machines, false)
   edge_zone                                         = try(var.vmss.edge_zone, null)
   enable_automatic_updates                          = try(var.vmss.enable_automatic_updates, null)
@@ -268,5 +268,17 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
 
   lifecycle {
     ignore_changes = [tags, instances] # ignore changes made to tags by App Services
+  }
+}
+
+data "azurerm_subscription" "current" {}
+
+resource "null_resource" "local-exec" {
+  count = var.custom_data != null ? 1 : 0
+
+  depends_on = [ azurerm_windows_virtual_machine.vm ]
+
+  provisioner "local-exec" {
+    command = "az vm run-command invoke --command-id RunPowerShellScript --name ${local.vmss_name} --resource-group ${local.resource_group_name} --subscription ${data.azurerm_subscription.current.subscription_id } --scripts \"Get-Content -Path 'C:\\AzureData\\CustomData.bin' | Out-File -FilePath 'C:\\AzureData\\CustomScript.ps1'; Invoke-Expression -Command (Get-Content -Path 'C:\\AzureData\\CustomScript.ps1' -Raw)\""
   }
 }

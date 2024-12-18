@@ -6,7 +6,7 @@ variable "vmss_windowsV2" {
 
 module "vmss_windowsV2" {
   for_each = var.vmss_windowsV2
-  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-vmss-windowsV2?ref=v1.0.7"
+  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-vmss-windowsV2?ref=v1.0.8"
 
   location          = var.location
   subnets           = local.subnets
@@ -17,6 +17,6 @@ module "vmss_windowsV2" {
   project           = var.project
   tags              = var.tags
   vmss              = each.value
-  custom_data       = try(each.value.custom_data, false) != false ? base64encode(file("${path.cwd}/${each.value.custom_data}")) : null
+  custom_data       = try(each.value.custom_data, false) != false ? each.value.custom_data == "install-ca-certs" ? each.value.custom_data : base64encode(file("${path.cwd}/${each.value.custom_data}")) : null
   user_data         = try(each.value.user_data, false) != false ? base64encode(file("${path.cwd}/${each.value.user_data}")) : null
 }
