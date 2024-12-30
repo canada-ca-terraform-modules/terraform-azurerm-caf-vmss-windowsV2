@@ -276,7 +276,7 @@ data "azurerm_subscription" "current" {}
 resource "null_resource" "local-exec" {
   count = var.custom_data != null ? 1 : 0
 
-  depends_on = [ azurerm_windows_virtual_machine.vm ]
+  depends_on = [ azurerm_windows_virtual_machine_scale_set.vmss_windows ]
 
   provisioner "local-exec" {
     command = "az vm run-command invoke --command-id RunPowerShellScript --name ${local.vmss_name} --resource-group ${local.resource_group_name} --subscription ${data.azurerm_subscription.current.subscription_id } --scripts \"Get-Content -Path 'C:\\AzureData\\CustomData.bin' | Out-File -FilePath 'C:\\AzureData\\CustomScript.ps1'; Invoke-Expression -Command (Get-Content -Path 'C:\\AzureData\\CustomScript.ps1' -Raw)\""
