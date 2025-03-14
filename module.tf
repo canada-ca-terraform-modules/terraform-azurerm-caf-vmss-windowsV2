@@ -17,7 +17,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   eviction_policy                                   = try(var.vmss.eviction_policy, null)
   health_probe_id                                   = try(var.vmss.health_probe_id, null)
   host_group_id                                     = try(var.vmss.host_group_id, null)
-  license_type                                      = try(var.vmss.license_type, null)
+  license_type                                      = try(var.vmss.license_type, "Windows_Server")
   max_bid_price                                     = try(var.vmss.max_bid_price, null)
   overprovision                                     = try(var.vmss.overprovision, null)
   platform_fault_domain_count                       = try(var.vmss.platform_fault_domain_count, null)
