@@ -267,7 +267,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   }
 
   lifecycle {
-    ignore_changes = [tags, instances] # ignore changes made to tags by App Services
+    ignore_changes = [tags, instances, user_data, custom_data] # ignore changes made to tags by App Services
   }
 }
 
