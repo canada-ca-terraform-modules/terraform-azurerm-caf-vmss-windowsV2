@@ -8,7 +8,7 @@ locals {
   name-kv-21                = substr("${local.name-kv-16}-${local.kv_sha}", 0, 21)
   name-kv-21-clean          = replace(local.name-kv-21, "--", "-")   # remove double dash 
   kv_name                   = replace("${local.name-kv-21-clean}-kv", local.name-regex, "")
-  kv_resource_group_name    = try(var.windows_VM.key_vault.resource_group_name, "Keyvault")
+  kv_resource_group_name    = try(var.vmss.key_vault.resource_group_name, "Keyvault")
 }
 
 # Need to get info about the subscription key vault. If password_overwrite is true, then don't bother since we  won't use it
