@@ -15,7 +15,7 @@ vmss_windowsV2 = {
       storage_account_resource_id = ""   # (Optional) The resource ID of the Storage Account to use for Boot Diagnostics. Default: Create storage account for vmss boot diagnostic and serial console.
     }
 
-    instances = 0 # (Optional) The number of Virtual Machines in the Scale Set. Defaults to 0.
+    instances   = 0                  # (Optional) The number of Virtual Machines in the Scale Set. Defaults to 0.
     custom_data = "install-ca-certs" # Optional: Set this value with the relative path to the file from your CWD.
 
 
@@ -50,9 +50,12 @@ vmss_windowsV2 = {
           }
         }
         # dns_servers                   = ["1.1.1.1"] # (Optional) A list of IP Addresses of DNS Servers which should be assigned to the Network Interface.
-        enable_accelerated_networking = false # (Optional) Enable Accelerated Networking? Default to false
-        enable_ip_forwarding          = false # (Optional) Enable IP Forwarding? Default to false
-        primary                       = true  # (Optional) Is this Network Interface the primary one? Default to true
+        accelerated_networking_enabled = false # (Optional) Enable Accelerated Networking? Default to false (v4 name: enable_accelerated_networking, still accepted)
+        ip_forwarding_enabled          = false # (Optional) Enable IP Forwarding? Default to false (v4 name: enable_ip_forwarding, still accepted)
+        primary                        = true  # (Optional) Is this Network Interface the primary one? Default to true
+        # auxiliary_mode                = ""    # (Optional) Specifies the auxiliary mode used to enable network high-performance feature on Network Virtual Appliances (NVAs). Possible values are AcceleratedConnections and Floating.
+        # auxiliary_sku                 = ""    # (Optional) Specifies the SKU used for the network high-performance feature on Network Virtual Appliances (NVAs). Possible values are A1, A2, A4 and A8.
+        # network_security_group_id     = ""    # (Optional) The ID of a Network Security Group which should be assigned to this Network Interface.
       }
     }
 
@@ -186,8 +189,8 @@ vmss_windowsV2 = {
     #     # disk_encryption_set_id         = ""             # (Optional) The ID of the Disk Encryption Set which should be used to encrypt this Data Disk. Changing this forces a new resource to be created.
     #     lun                            = 0              # (Required) The Logical Unit Number of the Data Disk, which must be unique within the Virtual Machine.
     #     # storage_account_type           = "Standard_LRS" # (Optional) The Type of Storage Account which should back this Data Disk. Possible values include Standard_LRS, StandardSSD_LRS, StandardSSD_ZRS, Premium_LRS, PremiumV2_LRS, Premium_ZRS and UltraSSD_LRS. Default to Standard_LRS
-    #     # ultra_ssd_disk_iops_read_write = ""             # (Optional) Specifies the Read-Write IOPS for this Data Disk. Only settable when storage_account_type is PremiumV2_LRS or UltraSSD_LRS.
-    #     # ultra_ssd_disk_mbps_read_write = ""             # (Optional) Specifies the bandwidth in MB per second for this Data Disk. Only settable when storage_account_type is PremiumV2_LRS or UltraSSD_LRS.
+    #     # disk_iops_read_write           = ""             # (Optional) Specifies the Read-Write IOPS for this Data Disk. Only settable when storage_account_type is PremiumV2_LRS or UltraSSD_LRS. (v4 name: ultra_ssd_disk_iops_read_write, still accepted)
+    #     # disk_mbps_read_write           = ""             # (Optional) Specifies the bandwidth in MB per second for this Data Disk. Only settable when storage_account_type is PremiumV2_LRS or UltraSSD_LRS. (v4 name: ultra_ssd_disk_mbps_read_write, still accepted)
     #     # write_accelerator_enabled      = ""             # (Optional) Should Write Accelerator be enabled for this Data Disk? Defaults to false.
     #   }
     # }
@@ -205,20 +208,23 @@ vmss_windowsV2 = {
 
     # Optional: Uncomment if you need to configure automatic os upgrade policy
     # automatic_os_upgrade_policy = [{
-    #   disable_automatic_rollback  = false # (Required) Should automatic rollbacks be disabled?
-    #   enable_automatic_os_upgrade = true  # (Required) Should OS Upgrades automatically be applied to Scale Set instances in a rolling fashion when a newer version of the OS Image becomes available?
+    #   automatic_rollback_enabled   = true # (Required) Should automatic rollbacks be enabled? (v4 name: disable_automatic_rollback, inverted boolean, still accepted)
+    #   automatic_os_upgrade_enabled = true # (Required) Should OS Upgrades automatically be applied to Scale Set instances in a rolling fashion when a newer version of the OS Image becomes available? (v4 name: enable_automatic_os_upgrade, still accepted)
     # }]
 
     # Optional: Uncomment if you need to configure automatic instance repair
     # automatic_instance_repair = [{
     #   enabled      = true    # (Required) Should the automatic instance repair be enabled on this Virtual Machine Scale Set?
     #   grace_period = "PT30M" # (Optional) Amount of time for which automatic repairs will be delayed. The grace period starts right after the VM is found unhealthy. Possible values are between 10 and 90 minutes. The time duration should be specified in ISO 8601 format (e.g. PT10M to PT90M).
+    #   action       = "Replace" # (Optional) The repair action that will be used for repairing unhealthy virtual machines in the scale set. Possible values include Replace, Restart, Reimage.
     # }]
     # capacity_reservation_group_id                     = ""                                            # (Optional) Specifies the ID of the Capacity Reservation Group which the Virtual Machine Scale Set should be allocated to. Changing this forces a new resource to be created.
     # do_not_run_extensions_on_overprovisioned_machines = false                                         # (Optional) Do not run extensions on overprovisioned machines? Default to false
     # edge_zone                                         = false                                         # (Optional) Specifies the Edge Zone within the Azure Region where this windows Virtual Machine Scale Set should exist. Changing this forces a new windows Virtual Machine Scale Set to be created. Default to null
-    # enable_automatic_updates                          = true                                          # (Optional) Are automatic updates enabled for this Virtual Machine? Defaults to true.
-    # encryption_at_host_enabled                        = false                                         # (Optional) Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host? Default to null
+    # automatic_updates_enabled                         = true                                          # (Optional) Are automatic updates enabled for this Virtual Machine? Defaults to true. (v4 name: enable_automatic_updates, still accepted)
+    # encryption_at_host_enabled                        = true                                          # (Optional) Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host? Default to true
+    # resilient_vm_creation_enabled                     = false                                         # (Optional) Should resilient VM creation be enabled? Defaults to false.
+    # resilient_vm_deletion_enabled                     = false                                         # (Optional) Should resilient VM deletion be enabled? Defaults to false.
 
     # Optional: Uncomment this if you want to deploy extensions on the VMSS
     # extension = {
