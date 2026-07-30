@@ -6,7 +6,7 @@ locals {
   kv_sha                    = substr(sha1(var.resource_groups["Keyvault"].id), 0, 8)
   name-kv-16                = substr("${local.env_4}CKV-${local.userDefinedString-replace}", 0, 16)
   name-kv-21                = substr("${local.name-kv-16}-${local.kv_sha}", 0, 21)
-  name-kv-21-clean          = replace(local.name-kv-21, "--", "-")   # remove double dash 
+  name-kv-21-clean          = replace(local.name-kv-21, "--", "-") # remove double dash 
   kv_name                   = replace("${local.name-kv-21-clean}-kv", local.name-regex, "")
   kv_resource_group_name    = try(var.vmss.key_vault.resource_group_name, "Keyvault")
 }
@@ -15,7 +15,7 @@ locals {
 data "azurerm_key_vault" "key_vault" {
   count               = try(var.vmss.admin_password, "") == "" ? 1 : 0
   name                = try(var.vmss.key_vault.name, local.kv_name)
-  resource_group_name = strcontains(local.kv_resource_group_name, "/resourceGroups/") ? regex("[^\\/]+$", local.kv_resource_group_name) : var.resource_groups[local.kv_resource_group_name].name
+  resource_group_name = strcontains(local.kv_resource_group_name, "/resourceGroups/") ? regex("[^/]+$", local.kv_resource_group_name) : var.resource_groups[local.kv_resource_group_name].name
 }
 
 # Generate a password if it will be necessary. Since it it only an inital password, ignore all changes to it

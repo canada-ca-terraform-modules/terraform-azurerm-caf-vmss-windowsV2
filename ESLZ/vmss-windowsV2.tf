@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 1.9"
+}
+
 variable "vmss_windowsV2" {
   type        = any
   default     = {}
@@ -6,7 +10,7 @@ variable "vmss_windowsV2" {
 
 module "vmss_windowsV2" {
   for_each = var.vmss_windowsV2
-  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-vmss-windowsV2?ref=v1.1.1"
+  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-vmss-windowsV2?ref=v1.2.0"
 
   location          = var.location
   subnets           = local.subnets

@@ -10,31 +10,34 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   custom_data                                       = var.custom_data == "install-ca-certs" ? data.http.custom_data[0].response_body_base64 : var.custom_data
   do_not_run_extensions_on_overprovisioned_machines = try(var.vmss.do_not_run_extensions_on_overprovisioned_machines, false)
   edge_zone                                         = try(var.vmss.edge_zone, null)
-  enable_automatic_updates                          = try(var.vmss.enable_automatic_updates, null)
-  encryption_at_host_enabled                        = try(var.vmss.encryption_at_host_enabled, false)
-  extension_operations_enabled                      = try(var.vmss.extension_operations_enabled, null)
-  extensions_time_budget                            = try(var.vmss.extensions_time_budget, null)
-  eviction_policy                                   = try(var.vmss.eviction_policy, null)
-  health_probe_id                                   = try(var.vmss.health_probe_id, null)
-  host_group_id                                     = try(var.vmss.host_group_id, null)
-  license_type                                      = try(var.vmss.license_type, "Windows_Server")
-  max_bid_price                                     = try(var.vmss.max_bid_price, null)
-  overprovision                                     = try(var.vmss.overprovision, null)
-  platform_fault_domain_count                       = try(var.vmss.platform_fault_domain_count, null)
-  priority                                          = try(var.vmss.priority, null)
-  provision_vm_agent                                = try(var.vmss.provision_vm_agent, null)
-  proximity_placement_group_id                      = try(var.vmss.proximity_placement_group_id, null)
-  secure_boot_enabled                               = try(var.vmss.secure_boot_enabled, null)
-  single_placement_group                            = try(var.vmss.single_placement_group, null)
-  sku                                               = var.vmss.sku
-  source_image_id                                   = try(var.vmss.source_image_id, null)
-  timezone                                          = try(var.vmss.timezone, null)
-  tags                                              = merge(var.tags, try(var.vmss.tags, {}))
-  upgrade_mode                                      = try(var.vmss.upgrade_mode, null)
-  user_data                                         = var.user_data
-  vtpm_enabled                                      = try(var.vmss.vtpm_enabled, null)
-  zone_balance                                      = try(var.vmss.zone_balance, null)
-  zones                                             = try(var.vmss.zones, null)
+  # v5 renamed enable_automatic_updates -> automatic_updates_enabled; fall back to old name for backward-compat
+  automatic_updates_enabled     = try(var.vmss.automatic_updates_enabled, var.vmss.enable_automatic_updates, null)
+  encryption_at_host_enabled    = try(var.vmss.encryption_at_host_enabled, true)
+  extension_operations_enabled  = try(var.vmss.extension_operations_enabled, null)
+  extensions_time_budget        = try(var.vmss.extensions_time_budget, null)
+  eviction_policy               = try(var.vmss.eviction_policy, null)
+  health_probe_id               = try(var.vmss.health_probe_id, null)
+  host_group_id                 = try(var.vmss.host_group_id, null)
+  license_type                  = try(var.vmss.license_type, "Windows_Server")
+  max_bid_price                 = try(var.vmss.max_bid_price, null)
+  overprovision                 = try(var.vmss.overprovision, null)
+  platform_fault_domain_count   = try(var.vmss.platform_fault_domain_count, null)
+  priority                      = try(var.vmss.priority, null)
+  provision_vm_agent            = try(var.vmss.provision_vm_agent, null)
+  proximity_placement_group_id  = try(var.vmss.proximity_placement_group_id, null)
+  secure_boot_enabled           = try(var.vmss.secure_boot_enabled, null)
+  single_placement_group        = try(var.vmss.single_placement_group, null)
+  sku                           = var.vmss.sku
+  source_image_id               = try(var.vmss.source_image_id, null)
+  timezone                      = try(var.vmss.timezone, null)
+  tags                          = merge(var.tags, try(var.vmss.tags, {}))
+  resilient_vm_creation_enabled = try(var.vmss.resilient_vm_creation_enabled, null)
+  resilient_vm_deletion_enabled = try(var.vmss.resilient_vm_deletion_enabled, null)
+  upgrade_mode                  = try(var.vmss.upgrade_mode, null)
+  user_data                     = var.user_data
+  vtpm_enabled                  = try(var.vmss.vtpm_enabled, null)
+  zone_balance                  = try(var.vmss.zone_balance, null)
+  zones                         = try(var.vmss.zones, null)
 
   dynamic "additional_capabilities" {
     for_each = try(var.vmss.additional_capabilities, null) != null ? [1] : []
@@ -54,8 +57,10 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   dynamic "automatic_os_upgrade_policy" {
     for_each = try(var.vmss.automatic_os_upgrade_policy, {})
     content {
-      disable_automatic_rollback  = try(automatic_os_upgrade_policy.value.disable_automatic_rollback, null)
-      enable_automatic_os_upgrade = try(automatic_os_upgrade_policy.value.enable_automatic_os_upgrade, null)
+      # v5 renamed fields; fall back to v4 names for backward-compat
+      # disable_automatic_rollback (v4) had inverted boolean -> automatic_rollback_enabled (v5)
+      automatic_rollback_enabled   = try(automatic_os_upgrade_policy.value.automatic_rollback_enabled, try(!automatic_os_upgrade_policy.value.disable_automatic_rollback, null))
+      automatic_os_upgrade_enabled = try(automatic_os_upgrade_policy.value.automatic_os_upgrade_enabled, try(automatic_os_upgrade_policy.value.enable_automatic_os_upgrade, null))
     }
   }
 
@@ -64,6 +69,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
     content {
       enabled      = try(automatic_instance_repair.value.enabled, null)
       grace_period = try(automatic_instance_repair.value.grace_period, null)
+      action       = try(automatic_instance_repair.value.action, null)
     }
   }
 
@@ -77,16 +83,17 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   dynamic "data_disk" {
     for_each = try(var.vmss.data_disk, {})
     content {
-      name                           = "${local.vmss_name}-datadisk${each.value.lun + 1}"
-      caching                        = try(data_disk.value.caching, "ReadWrite")
-      create_option                  = try(data_disk.value.create_option, "Empty")
-      disk_size_gb                   = try(data_disk.value.disk_size_gb, 256)
-      disk_encryption_set_id         = try(data_disk.value.disk_encryption_set_id, null)
-      lun                            = data_disk.value.lun
-      storage_account_type           = try(data_disk.value.storage_account_type, "Standard_LRS")
-      ultra_ssd_disk_iops_read_write = try(data_disk.value.ultra_ssd_disk_iops_read_write, null)
-      ultra_ssd_disk_mbps_read_write = try(data_disk.value.ultra_ssd_disk_mbps_read_write, null)
-      write_accelerator_enabled      = try(data_disk.value.write_accelerator_enabled, false)
+      name                   = "${local.vmss_name}-datadisk${data_disk.value.lun + 1}"
+      caching                = try(data_disk.value.caching, "ReadWrite")
+      create_option          = try(data_disk.value.create_option, "Empty")
+      disk_size_gb           = try(data_disk.value.disk_size_gb, 256)
+      disk_encryption_set_id = try(data_disk.value.disk_encryption_set_id, null)
+      lun                    = data_disk.value.lun
+      storage_account_type   = try(data_disk.value.storage_account_type, "Standard_LRS")
+      # v5 renamed ultra_ssd_disk_iops_read_write -> disk_iops_read_write; fallback to old name
+      disk_iops_read_write      = try(data_disk.value.disk_iops_read_write, data_disk.value.ultra_ssd_disk_iops_read_write, null)
+      disk_mbps_read_write      = try(data_disk.value.disk_mbps_read_write, data_disk.value.ultra_ssd_disk_mbps_read_write, null)
+      write_accelerator_enabled = try(data_disk.value.write_accelerator_enabled, false)
     }
   }
   dynamic "extension" {
@@ -104,7 +111,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
         for_each = try(extension.value.protected_settings_from_key_vault, {})
         content {
           secret_url      = protected_settings_from_key_vault.value.secret_url
-          source_vault_id = rotected_settings_from_key_vault.value.source_vault_id
+          source_vault_id = protected_settings_from_key_vault.value.source_vault_id
         }
       }
       provision_after_extensions = try(extension.value.provision_after_extensions, null)
@@ -134,11 +141,15 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   dynamic "network_interface" {
     for_each = var.vmss.nic
     content {
-      name                          = "${local.vmss_name}-${network_interface.key}"
-      dns_servers                   = try(network_interface.value.dns_servers, null)
-      enable_accelerated_networking = try(network_interface.value.enable_accelerated_networking, false)
-      enable_ip_forwarding          = try(network_interface.value.enable_ip_forwarding, false)
-      primary                       = try(network_interface.value.primary, true)
+      name           = "${local.vmss_name}-${network_interface.key}"
+      auxiliary_mode = try(network_interface.value.auxiliary_mode, null)
+      auxiliary_sku  = try(network_interface.value.auxiliary_sku, null)
+      dns_servers    = try(network_interface.value.dns_servers, null)
+      # v5 renamed enable_* -> *_enabled; fall back to old names for backward-compat
+      accelerated_networking_enabled = try(network_interface.value.accelerated_networking_enabled, network_interface.value.enable_accelerated_networking, false)
+      ip_forwarding_enabled          = try(network_interface.value.ip_forwarding_enabled, network_interface.value.enable_ip_forwarding, false)
+      network_security_group_id      = try(network_interface.value.network_security_group_id, null)
+      primary                        = try(network_interface.value.primary, true)
 
       dynamic "ip_configuration" {
         for_each = var.vmss.nic[network_interface.key].ip_configuration
@@ -159,8 +170,8 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
               dynamic "ip_tag" {
                 for_each = try(public_ip_address.value.ip_tags, {})
                 content {
-                  tag  = ip_tags.value.tag
-                  type = ip_tags.value.type
+                  tag  = ip_tag.value.tag
+                  type = ip_tag.value.type
                 }
               }
               public_ip_prefix_id = try(public_ip_address.value.public_ip_prefix_id, null)
@@ -216,8 +227,8 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   dynamic "scale_in" {
     for_each = try(var.vmss.scale_in, false) != false ? [1] : []
     content {
-      rule                   = try(scale_in.value.rule, null)
-      force_deletion_enabled = try(scale_in.value.force_deletion_enabled, null)
+      rule                   = try(var.vmss.scale_in.rule, null)
+      force_deletion_enabled = try(var.vmss.scale_in.force_deletion_enabled, null)
     }
   }
 
@@ -276,9 +287,9 @@ data "azurerm_subscription" "current" {}
 resource "null_resource" "local-exec" {
   count = var.custom_data != null ? 1 : 0
 
-  depends_on = [ azurerm_windows_virtual_machine_scale_set.vmss_windows ]
+  depends_on = [azurerm_windows_virtual_machine_scale_set.vmss_windows]
 
   provisioner "local-exec" {
-    command = "az vm run-command invoke --command-id RunPowerShellScript --name ${local.vmss_name} --resource-group ${local.resource_group_name} --subscription ${data.azurerm_subscription.current.subscription_id } --scripts \"Get-Content -Path 'C:\\AzureData\\CustomData.bin' | Out-File -FilePath 'C:\\AzureData\\CustomScript.ps1'; Invoke-Expression -Command (Get-Content -Path 'C:\\AzureData\\CustomScript.ps1' -Raw)\""
+    command = "az vm run-command invoke --command-id RunPowerShellScript --name ${local.vmss_name} --resource-group ${local.resource_group_name} --subscription ${data.azurerm_subscription.current.subscription_id} --scripts \"Get-Content -Path 'C:\\AzureData\\CustomData.bin' | Out-File -FilePath 'C:\\AzureData\\CustomScript.ps1'; Invoke-Expression -Command (Get-Content -Path 'C:\\AzureData\\CustomScript.ps1' -Raw)\""
   }
 }

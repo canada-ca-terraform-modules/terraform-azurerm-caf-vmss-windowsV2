@@ -1,6 +1,6 @@
 # A storage account is needed to store the boot diagnostic logs
 module "boot_diagnostic_storage" {
-  source = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-storage_accountV2.git?ref=v1.0.3"
+  source = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-storage_accountV2.git?ref=v1.2.0"
   count  = try(var.vmss.boot_diagnostic.use_managed_storage_account, true) ? 0 : (try(var.vmss.boot_diagnostic, false) ? (try(var.vmss.boot_diagnostic.storage_account_resource_id, "") == "" ? 1 : 0) : 0)
 
   userDefinedString    = "${var.userDefinedString}-logs"
@@ -26,7 +26,7 @@ module "boot_diagnostic_storage" {
 
 # Create a user assigned identity for the VM if one is not provided
 resource "azurerm_user_assigned_identity" "user_assigned_identity_vmss_windows" {
-  count = try(var.vmss.boot_diagnostic.use_managed_storage_account, true) ? 0 : (try(var.vmss.identity.type, "UserAssigned") == "UserAssigned" ? (try(var.vmss.identity.identity_ids, []) == [] ? 1 : 0) : 0)
+  count = try(var.vmss.boot_diagnostic.use_managed_storage_account, true) ? 0 : (try(var.vmss.identity.type, "UserAssigned") == "UserAssigned" ? (length(try(var.vmss.identity.identity_ids, [])) == 0 ? 1 : 0) : 0)
 
   location            = var.location
   name                = "${local.vmss_name}-vmss-uai"
@@ -39,5 +39,5 @@ resource "azurerm_role_assignment" "vmss_contributor" {
 
   scope                = try(var.vmss.boot_diagnostic.storage_account_resource_id, "") == "" ? module.boot_diagnostic_storage[0].id : var.vmss.boot_diagnostic.storage_account_resource_id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = try(var.vmss.identity.identity_ids, []) == [] ? azurerm_user_assigned_identity.user_assigned_identity_vmss_windows[0].principal_id : var.vmss.identity.identity_ids[0]
+  principal_id         = length(try(var.vmss.identity.identity_ids, [])) == 0 ? azurerm_user_assigned_identity.user_assigned_identity_vmss_windows[0].principal_id : var.vmss.identity.identity_ids[0]
 }
