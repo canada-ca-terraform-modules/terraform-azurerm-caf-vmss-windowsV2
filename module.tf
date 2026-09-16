@@ -7,7 +7,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss_windows" {
   instances                                         = try(var.vmss.instances, 0)
   capacity_reservation_group_id                     = try(var.vmss.capacity_reservation_group_id, null)
   computer_name_prefix                              = try(var.vmss.computer_name_prefix, "vmsswin-")
-  custom_data                                       = var.custom_data == "install-ca-certs" ? data.http.custom_data[0].response_body_base64 : var.custom_data
+  custom_data                                       = local.custom_data_is_remote ? data.http.custom_data[0].response_body_base64 : var.custom_data
   do_not_run_extensions_on_overprovisioned_machines = try(var.vmss.do_not_run_extensions_on_overprovisioned_machines, false)
   edge_zone                                         = try(var.vmss.edge_zone, null)
   # v5 renamed enable_automatic_updates -> automatic_updates_enabled; fall back to old name for backward-compat

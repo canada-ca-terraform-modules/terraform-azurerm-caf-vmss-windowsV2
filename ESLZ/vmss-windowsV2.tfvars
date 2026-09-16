@@ -15,8 +15,8 @@ vmss_windowsV2 = {
       storage_account_resource_id = ""   # (Optional) The resource ID of the Storage Account to use for Boot Diagnostics. Default: Create storage account for vmss boot diagnostic and serial console.
     }
 
-    instances   = 0                  # (Optional) The number of Virtual Machines in the Scale Set. Defaults to 0.
-    custom_data = "install-ca-certs" # Optional: Set this value with the relative path to the file from your CWD.
+    instances   = 0 # (Optional) The number of Virtual Machines in the Scale Set. Defaults to 0.
+    custom_data = "https://gcpcenteslzpublicblob4df.blob.core.windows.net/publicresources/windows-all-customdata-default.ps1" # Optional: Set this to an http(s) URL to fetch, a relative path to a local file from your CWD, or the legacy "install-ca-certs" keyword.
 
 
     # At least one nic is required. If more than one is present, the first nic in the list will be the primary one.

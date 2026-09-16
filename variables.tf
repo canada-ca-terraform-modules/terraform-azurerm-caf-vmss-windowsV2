@@ -48,7 +48,7 @@ variable "subnets" {
 }
 
 variable "custom_data" {
-  description = "(Optional) The Base64-Encoded Custom Data which should be used for this Virtual Machine Scale Set."
+  description = "(Optional) The Custom Data which should be used for this Virtual Machine Scale Set. Accepts an http(s) URL to fetch and use as custom data, the legacy \"install-ca-certs\" keyword (fetches the module's default script), or a Base64-Encoded string passed through as-is."
   type        = string
   default     = null
 }

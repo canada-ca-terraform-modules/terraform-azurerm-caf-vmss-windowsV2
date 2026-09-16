@@ -660,3 +660,136 @@ run "scale_in_args" {
     error_message = "scale_in.force_deletion_enabled must be true (bug fix: was previously always null)"
   }
 }
+
+run "custom_data_url_is_fetched" {
+  command = plan
+
+  override_data {
+    target = data.http.custom_data
+    values = {
+      response_body_base64 = "ZmFrZS1jbG91ZC1pbml0LWNvbnRlbnQ="
+    }
+  }
+
+  variables {
+    custom_data = "https://example.com/publicresources/cloud-init-default.yaml"
+    vmss = {
+      postfix             = "001"
+      resource_group_name = "MyRG"
+      sku                 = "Standard_D2s_v3"
+      admin_password      = "P@55w0rd1234!"
+      source_image_reference = {
+        publisher = "MicrosoftWindowsServer"
+        offer     = "WindowsServer"
+        sku       = "2022-datacenter-g2"
+        version   = "latest"
+      }
+      os_disk = {
+        caching              = "ReadWrite"
+        storage_account_type = "Standard_LRS"
+      }
+      nic = {
+        nic1 = {
+          ip_configuration = {
+            ipc1 = {
+              subnet = "subnet1"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_windows_virtual_machine_scale_set.vmss_windows.custom_data == "ZmFrZS1jbG91ZC1pbml0LWNvbnRlbnQ="
+    error_message = "custom_data must equal the fetched remote content when an http(s) URL is provided"
+  }
+}
+
+run "custom_data_legacy_keyword_still_works" {
+  command = plan
+
+  override_data {
+    target = data.http.custom_data
+    values = {
+      response_body_base64 = "ZmFrZS1sZWdhY3ktc2NyaXB0"
+    }
+  }
+
+  variables {
+    custom_data = "install-ca-certs"
+    vmss = {
+      postfix             = "001"
+      resource_group_name = "MyRG"
+      sku                 = "Standard_D2s_v3"
+      admin_password      = "P@55w0rd1234!"
+      source_image_reference = {
+        publisher = "MicrosoftWindowsServer"
+        offer     = "WindowsServer"
+        sku       = "2022-datacenter-g2"
+        version   = "latest"
+      }
+      os_disk = {
+        caching              = "ReadWrite"
+        storage_account_type = "Standard_LRS"
+      }
+      nic = {
+        nic1 = {
+          ip_configuration = {
+            ipc1 = {
+              subnet = "subnet1"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_windows_virtual_machine_scale_set.vmss_windows.custom_data == "ZmFrZS1sZWdhY3ktc2NyaXB0"
+    error_message = "Legacy \"install-ca-certs\" keyword must still fetch the module's default script"
+  }
+}
+
+run "custom_data_plain_value_passthrough" {
+  command = plan
+
+  variables {
+    custom_data = "cGxhaW4tYmFzZTY0LXN0cmluZw=="
+    vmss = {
+      postfix             = "001"
+      resource_group_name = "MyRG"
+      sku                 = "Standard_D2s_v3"
+      admin_password      = "P@55w0rd1234!"
+      source_image_reference = {
+        publisher = "MicrosoftWindowsServer"
+        offer     = "WindowsServer"
+        sku       = "2022-datacenter-g2"
+        version   = "latest"
+      }
+      os_disk = {
+        caching              = "ReadWrite"
+        storage_account_type = "Standard_LRS"
+      }
+      nic = {
+        nic1 = {
+          ip_configuration = {
+            ipc1 = {
+              subnet = "subnet1"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_windows_virtual_machine_scale_set.vmss_windows.custom_data == "cGxhaW4tYmFzZTY0LXN0cmluZw=="
+    error_message = "Plain/pre-encoded custom_data must pass through unchanged"
+  }
+
+  assert {
+    condition     = length(data.http.custom_data) == 0
+    error_message = "http data source must not be invoked when custom_data is not a URL or the legacy keyword"
+  }
+}

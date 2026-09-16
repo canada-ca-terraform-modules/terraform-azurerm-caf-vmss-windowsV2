@@ -3,6 +3,13 @@
 All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Changed
+
+- `custom_data` now accepts any http(s) URL, which the module fetches and uses as the (already Base64-encoded) custom data. Previously only the hard-coded `"install-ca-certs"` keyword could trigger a remote fetch. The `"install-ca-certs"` keyword is still supported for backward compatibility. Plain/pre-encoded strings continue to pass through unchanged.
+- `ESLZ/vmss-windowsV2.tfvars` example `custom_data` updated from the `"install-ca-certs"` keyword to the explicit default script URL.
+
 ## [1.2.0] - 2026-07-30
 
 ### Changed
